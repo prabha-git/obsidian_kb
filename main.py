@@ -1,28 +1,16 @@
 import streamlit as st
 from dotenv import load_dotenv
-from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_community.chat_message_histories import ChatMessageHistory, StreamlitChatMessageHistory
 from langchain_community.llms import Ollama
-from langchain_cohere import CohereRerank
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
+from langchain_openai import ChatOpenAI
+from rag import DocumentRetriever
+
 
 # Load environment variables from .env file
 load_dotenv()
-
-# Initialize components
-embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
-compressor = CohereRerank()
-
-# Initialize Pinecone retriever
-index_name = "obsidian-kb"
-pinecone_retriever = PineconeVectorStore.from_existing_index(index_name=index_name, embedding=embeddings).as_retriever()
-
-# Initialize Contextual Compression Retriever
-compression_retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=pinecone_retriever)
 
 # Initialize chat message history
 msgs = StreamlitChatMessageHistory(key="chat_messages")
@@ -68,6 +56,8 @@ with_message_history = RunnableWithMessageHistory(
     history_messages_key="history",
 )
 
+doc_retreiver = DocumentRetriever()
+
 # Display and handle chat interaction
 for msg in msgs.messages:
     st.chat_message(msg.type).write(msg.content)
@@ -77,8 +67,7 @@ if user_prompt := st.chat_input():
     st.chat_message("human").write(user_prompt)
 
     # Retrieve context from documents and add to history
-    retrieved_docs = compression_retriever.invoke(user_prompt)
-    retrieved_context = " ".join([doc.page_content for doc in retrieved_docs])
+    retrieved_context = doc_retreiver.get_relevant_doc(user_prompt)
     msgs.add_user_message(user_prompt)
 
     # Process the input using the chain with history
