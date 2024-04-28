@@ -71,7 +71,7 @@ def evaluate_dataset():
         dataset_name=dataset_name,
         llm_or_chain_factory=get_rag_context_answer,
         evaluation=eval_config,
-        project_metadata={'llm_used':llm_name}
+        project_metadata={'llm_used':llm_name,'version':'1.0'}
 )
     return results
 
