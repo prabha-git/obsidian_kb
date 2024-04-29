@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
+from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain_pinecone import PineconeVectorStore
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_cohere import CohereRerank
 
 
@@ -11,12 +12,14 @@ class DocumentRetriever:
         load_dotenv()
 
         # Initialize components
+        self.llm = ChatOpenAI(model_name='gpt-4-turbo-2024-04-09',temperature=0)
         self.embeddings = OpenAIEmbeddings(model=model_name)
-        self.compressor = CohereRerank()
+        self.compressor = CohereRerank(top_n=20)
         self.retriever = PineconeVectorStore.from_existing_index(index_name=index_name,
-                                                                 embedding=self.embeddings).as_retriever()
+                                                                 embedding=self.embeddings).as_retriever(search_kwargs={"k": 20})
+        self.multiquery_retriever = MultiQueryRetriever.from_llm(self.retriever,llm=self.llm)
         self.compression_retriever = ContextualCompressionRetriever(base_compressor=self.compressor,
-                                                                    base_retriever=self.retriever)
+                                                                    base_retriever=self.multiquery_retriever)
 
     def get_relevant_doc(self, query):
         retrieved_docs = self.compression_retriever.invoke(query)
