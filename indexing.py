@@ -34,7 +34,7 @@ def read_files_and_embed(directory):
                 data = loader.load()
                 # Cleaning the dataview queries from content
                 clean_content = clean_content_below_header(data[0].page_content)
-                data[0].page_content = f"File: {file_path}\n{clean_content}"
+                data[0].page_content = f"\n\nFile: {file_path}\n{clean_content}"
                 PineconeVectorStore.from_documents(data, embeddings, index_name=index_name)
                 print(f"path: {file_path} added to pinecone vector database")
 
