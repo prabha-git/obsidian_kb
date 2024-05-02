@@ -15,7 +15,7 @@ class DocumentRetriever:
         self.llm = ChatOpenAI(model_name='gpt-4-turbo-2024-04-09',temperature=0)
         self.embeddings = OpenAIEmbeddings(model=model_name)
         self.compressor = CohereRerank(top_n=20)
-        self.retriever = PineconeVectorStore.from_existing_index(index_name=index_name,
+        self.retriever = PineconeVectorStore.from_existing_index(index_name=index_name,namespace='default',
                                                                  embedding=self.embeddings).as_retriever(search_kwargs={"k": 20})
         self.multiquery_retriever = MultiQueryRetriever.from_llm(self.retriever,llm=self.llm)
         self.compression_retriever = ContextualCompressionRetriever(base_compressor=self.compressor,
@@ -28,4 +28,4 @@ class DocumentRetriever:
 
 if __name__=='__main__':
     doc_retreiver = DocumentRetriever()
-    print(doc_retreiver.get_relevant_doc("What did i do on Mar 9, 2024"))
+    print(f""" retrieved documents are {doc_retreiver.get_relevant_doc("What did i do on Mar 9, 2024")}""")
