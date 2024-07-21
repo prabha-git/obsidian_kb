@@ -12,7 +12,7 @@ class DocumentRetriever:
         load_dotenv()
 
         # Initialize components
-        self.llm = ChatOpenAI(model_name='gpt-4-turbo-2024-04-09',temperature=0)
+        self.llm = ChatOpenAI(model_name='gpt-4o',temperature=0)
         self.embeddings = OpenAIEmbeddings(model=model_name)
         self.compressor = CohereRerank(top_n=20)
         self.retriever = PineconeVectorStore.from_existing_index(index_name=index_name,namespace='default',
