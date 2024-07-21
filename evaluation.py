@@ -24,8 +24,8 @@ from ragas.metrics import (
 load_dotenv()
 
 client = langsmith.Client()
-dataset_name = "obsidian-evaluation"
-llm_name='gpt-4-turbo-2024-04-09'
+dataset_name = "obsidian-evaluation-v1"
+llm_name='gpt-4o'
 #llm_name='ollama-llama3-8b'
 doc_retreiver = DocumentRetriever()
 
