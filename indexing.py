@@ -40,9 +40,11 @@ def read_files(directory):
             if file.endswith(".md"):
                 file_path = os.path.join(root, file)
                 loader = UnstructuredMarkdownLoader(file_path)
-                docs.append(loader.load()[0])
+                document = loader.load()[0]
+
                 # Cleaning the dataview queries from content
-                # clean_content = clean_content_below_header(data[0].page_content)
+                document.page_content = clean_content_below_header(document.page_content)
+                docs.append(document)
                 # data[0].page_content = f"\n\nFile: {file_path}\n{clean_content}"
                 # PineconeVectorStore.from_documents(data, embeddings, index_name=index_name)
                 # print(f"path: {file_path} added to pinecone vector database")
