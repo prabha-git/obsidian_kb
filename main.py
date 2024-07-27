@@ -45,6 +45,14 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
         st.session_state.chat_histories[session_id] = ChatMessageHistory()
     return st.session_state.chat_histories[session_id]
 
+def get_session_history_message_texts(session_id: str) -> str:
+
+    msg_text=""
+    messages = get_session_history(session_id).messages
+    for msg in messages:
+        msg_text+="<"+msg.type+">"+": "+msg.content+"\n"
+    return msg_text
+
 # Streamlit UI
 st.title("Q&A Chat with Enhanced Context and History")
 
@@ -72,6 +80,8 @@ doc_retreiver = DocumentRetriever()
 for msg in msgs.messages:
     st.chat_message(msg.type).write(msg.content)
 
+
+
 session_id = get_session_id()
 # User input
 if user_prompt := st.chat_input():
@@ -79,7 +89,7 @@ if user_prompt := st.chat_input():
 
     # Retrieve context from documents and add to history
     print(st.session_state.chat_histories)
-    retrieved_context = doc_retreiver.get_relevant_doc(user_prompt)
+    retrieved_context = doc_retreiver.get_relevant_doc(user_prompt, chat_history=get_session_history_message_texts(session_id))
     msgs.add_user_message(user_prompt)
 
     # Process the input using the chain with history
