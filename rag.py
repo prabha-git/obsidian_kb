@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
-from langchain_core.prompts import PromptTemplate
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
@@ -18,13 +17,6 @@ class DocumentRetriever:
         self.compressor = CohereRerank(top_n=20)
         self.retriever = PineconeVectorStore.from_existing_index(index_name=index_name,namespace='default',
                                                                  embedding=self.embeddings).as_retriever(search_kwargs={"k": 20})
-        # self.multiquery_retriever_template = PromptTemplate(input_variables=['question'],
-        #                                                     template="""You are an AI language model assistant. Your task is \n
-        #                                                     to generate 3 different versions of the given user \n    question by taking previous chat history into account,  to retrieve relevant documents from a vector  database. \n
-        #                                                     By generating multiple perspectives on the user question, \n    your goal is to help the user overcome some of the limitations \n
-        #                                                     of distance-based similarity search. Provide these alternative \n
-        #                                                     questions separated by newlines. Original question: {question}' \n\n
-        #                                                     chat history: {history}""")
 
         self.multiquery_retriever = MultiQueryRetriever.from_llm(self.retriever,llm=self.llm)
         self.compression_retriever = ContextualCompressionRetriever(base_compressor=self.compressor,

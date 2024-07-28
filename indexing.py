@@ -32,6 +32,9 @@ def clean_content_below_header(content, header="Task Due\n"):
         return content[:header_index]
     return content  # Return the original content if the header is not found
 
+def extract_date_from_filename(filename):
+    match = re.match(r'(\d{4}-\d{2}-\d{2})', filename)
+    return match.group(1) if match else None
 
 def read_files(directory):
     docs = []
@@ -44,6 +47,9 @@ def read_files(directory):
 
                 # Cleaning the dataview queries from content
                 document.page_content = clean_content_below_header(document.page_content)
+                # Extract date from filename
+                date = extract_date_from_filename(file)
+                document.metadata['date'] = date
                 docs.append(document)
                 # data[0].page_content = f"\n\nFile: {file_path}\n{clean_content}"
                 # PineconeVectorStore.from_documents(data, embeddings, index_name=index_name)
@@ -62,7 +68,7 @@ def index_docs(docs):
     )
     return indexing_stats
 
-directory = "../prabha-git.github.io/"
+directory = "../prabha-git.github.io/Daily Notes"
 docs = read_files(directory)
 indexing_stats = index_docs(docs)
 print(f"Indexing stats: {indexing_stats}")
