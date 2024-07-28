@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 from langchain.retrievers.contextual_compression import ContextualCompressionRetriever
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.prompts import PromptTemplate
-#from langchain.retrievers.multi_query import MultiQueryRetriever
 from libs.custom_multiquery_retriever import CustomMultiQueryRetriever
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
