@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import re
 # Load environment variables from .env file
 load_dotenv()
+from datetime import datetime
 
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
 
@@ -22,8 +23,6 @@ rm.create_schema()
 vectorstore = PineconeVectorStore.from_existing_index(index_name=index_name,embedding=embeddings,namespace="default")
 
 
-import re
-
 def clean_content_below_header(content, header="Task Due\n"):
     # Find the position of the header in the content
     header_index = content.find(header)
@@ -34,7 +33,17 @@ def clean_content_below_header(content, header="Task Due\n"):
 
 def extract_date_from_filename(filename):
     match = re.match(r'(\d{4}-\d{2}-\d{2})', filename)
-    return match.group(1) if match else None
+    if match:
+        date_str = match.group(1)
+        try:
+            # Parse the date string to ensure it's valid
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+            # Convert to integer in the format YYYYMMDD
+            return int(date_obj.strftime('%Y%m%d'))
+        except ValueError:
+            # If the date is not valid, return None
+            return None
+    return None
 
 def read_files(directory):
     docs = []
