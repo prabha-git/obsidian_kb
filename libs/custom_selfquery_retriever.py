@@ -1,9 +1,12 @@
-from langchain.retrievers.self_query.base import SelfQueryRetriever,_get_builtin_translator
+from langchain.retrievers.self_query.base import (
+    SelfQueryRetriever,
+    _get_builtin_translator,
+)
 from langchain_core.language_models import BaseLanguageModel
 from typing import Any, List, Optional, Sequence, Tuple, Union, Dict
 from langchain.chains.query_constructor.schema import AttributeInfo
 from langchain_core.prompts import BasePromptTemplate
-from langchain_core.structured_query import Comparator, Operator,Visitor
+from langchain_core.structured_query import Comparator, Operator, Visitor
 from langchain_core.prompts import PromptTemplate
 from langchain_core.prompts.few_shot import FewShotPromptTemplate
 from langchain_core.runnables import Runnable
@@ -18,7 +21,7 @@ from langchain.chains.query_constructor.prompt import (
     DEFAULT_PREFIX,
     SUFFIX_WITHOUT_DATA_SOURCE,
     DEFAULT_SUFFIX,
-    )
+)
 import json
 
 
@@ -107,6 +110,7 @@ DEFAULT_EXAMPLES = [
 
 DEFAULT_SCHEMA_PROMPT = PromptTemplate.from_template(DEFAULT_SCHEMA)
 
+
 def construct_examples(input_output_pairs: Sequence[Tuple[str, dict]]) -> List[dict]:
     """Construct examples from input-output pairs.
 
@@ -128,6 +132,7 @@ def construct_examples(input_output_pairs: Sequence[Tuple[str, dict]]) -> List[d
         }
         examples.append(example)
     return examples
+
 
 def get_query_constructor_prompt(
     document_contents: str,
@@ -189,12 +194,14 @@ def get_query_constructor_prompt(
         **kwargs,
     )
 
+
 def _format_attribute_info(info: Sequence[Union[AttributeInfo, dict]]) -> str:
     info_dicts = {}
     for i in info:
         i_dict = dict(i)
         info_dicts[i_dict.pop("name")] = i_dict
     return json.dumps(info_dicts, indent=4).replace("{", "{{").replace("}", "}}")
+
 
 def load_query_constructor_runnable(
     llm: BaseLanguageModel,
@@ -253,7 +260,9 @@ def load_query_constructor_runnable(
     )
     return prompt | llm | output_parser
 
+
 QUERY_CONSTRUCTOR_RUN_NAME = "query_constructor"
+
 
 class CustomSelfQueryRetriever(SelfQueryRetriever):
 
