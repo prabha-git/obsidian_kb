@@ -26,6 +26,7 @@ langchain-community = "^0.2.10"
 langchain-openai = "^0.1.19"
 lark = "^1.1.9"
 langchain-chroma = "^0.1.2"
+black = "^24.8.0"
 
 
 [build-system]

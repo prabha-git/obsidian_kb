@@ -20,14 +20,13 @@ class BQSQLRecordManager:
         self.table_id = table_id
         self.client = bigquery.Client(project=self.project_id)
         self.table_ref = self.client.get_table(f"{self.dataset_id}.{self.table_id}")
-        self.schema =  [
+        self.schema = [
             bigquery.SchemaField("uuid", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("key", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("namespace", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("group_id", "STRING"),
             bigquery.SchemaField("updated_at", "FLOAT64", mode="REQUIRED"),
         ]
-
 
     def create_schema(self) -> None:
         table = bigquery.Table(self.table_ref, schema=self.schema)
@@ -40,11 +39,11 @@ class BQSQLRecordManager:
         return float(list(result)[0]["current_time"])
 
     def update(
-            self,
-            keys: Sequence[str],
-            *,
-            group_ids: Optional[Sequence[Optional[str]]] = None,
-            time_at_least: Optional[float] = None,
+        self,
+        keys: Sequence[str],
+        *,
+        group_ids: Optional[Sequence[Optional[str]]] = None,
+        time_at_least: Optional[float] = None,
     ) -> None:
         if group_ids is None:
             group_ids = [None] * len(keys)
@@ -74,9 +73,9 @@ class BQSQLRecordManager:
 
         # Create a temporary table to store the rows to upsert
         temp_table_name = f"{self.table_id}_temp_{uuid.uuid4().hex}"
-        table_id= f"{self.project_id}.{self.dataset_id}.{temp_table_name}"
-        temp_table =  bigquery.Table(table_id, schema=self.schema)
-        temp_table_ref= self.client.create_table(temp_table)
+        table_id = f"{self.project_id}.{self.dataset_id}.{temp_table_name}"
+        temp_table = bigquery.Table(table_id, schema=self.schema)
+        temp_table_ref = self.client.create_table(temp_table)
 
         # Load the rows into the temporary table
         job_config = bigquery.LoadJobConfig()
@@ -137,9 +136,9 @@ class BQSQLRecordManager:
             FROM `{self.project_id}.{self.dataset_id}.{self.table_id}`
             WHERE namespace = @namespace
         """
-        query_parameters=[
-                bigquery.ScalarQueryParameter("namespace", "STRING", self.namespace),
-            ]
+        query_parameters = [
+            bigquery.ScalarQueryParameter("namespace", "STRING", self.namespace),
+        ]
 
         if after:
             query += " AND updated_at > @after"
@@ -163,9 +162,7 @@ class BQSQLRecordManager:
                 bigquery.ScalarQueryParameter("limit", "INT64", limit)
             )
 
-        job_config = bigquery.QueryJobConfig(
-                query_parameters=query_parameters
-            )
+        job_config = bigquery.QueryJobConfig(query_parameters=query_parameters)
 
         query_job = self.client.query(query, job_config=job_config)
         results = query_job.result()
@@ -202,6 +199,8 @@ class BQSQLRecordManager:
                     if attempt < retries - 1:
                         time.sleep(delay)  # Wait before retrying
                     else:
-                        raise RuntimeError(f"Failed to delete keys after {retries} attempts.")
+                        raise RuntimeError(
+                            f"Failed to delete keys after {retries} attempts."
+                        )
                 else:
                     raise e
