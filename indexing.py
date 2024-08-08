@@ -122,7 +122,7 @@ def index_docs(docs: List[UnstructuredMarkdownLoader]) -> dict:
 
 
 if __name__ == "__main__":
-    directory = "../prabha-git.github.io/Daily Notes"
+    directory = "daily_notes_sample"
     docs = read_files(directory)
     indexing_stats = index_docs(docs)
     print(f"Indexing stats: {indexing_stats}")
