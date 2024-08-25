@@ -92,17 +92,18 @@ def get_session_history_message_texts(session_id: str) -> str:
 
 
 # Streamlit UI
-st.title("Q&A Chat with Enhanced Context and History")
+st.markdown("""
+    <h1 style="
+        border: 2px solid #4CAF50;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+    ">📔 Personal Knowledge Assistant</h1>
+""", unsafe_allow_html=True)
 
-# Radio button for selecting the LLM, now placed in the sidebar
-llm_choice = st.sidebar.radio("Select LLM", ("OpenAI", "Ollama"))
-
-# Dynamic model selection based on user input
-llm = (
-    ChatOpenAI(model=DEFAULT_LLM_MODEL)
-    if llm_choice == "OpenAI"
-    else Ollama(model=ALTERNATE_LLM_MODEL)
-)
+# Remove the sidebar and set a default LLM
+llm_choice = "OpenAI"
+llm = ChatOpenAI(model=DEFAULT_LLM_MODEL)
 
 runnable = prompt | llm
 
@@ -137,9 +138,5 @@ if user_prompt := st.chat_input():
     response = with_message_history.invoke(
         {"question": user_prompt, "context": retrieved_context}, config
     )
-    if llm_choice == "OpenAI":
-        msgs.add_ai_message(response.content)
-        st.chat_message("ai").write(response.content)
-    else:
-        msgs.add_ai_message(response)
-        st.chat_message("ai").write(response)
+    msgs.add_ai_message(response.content)
+    st.chat_message("ai").write(response.content)
